@@ -1,0 +1,17 @@
+This system would embed mechanism to enforce storage related SLA in the file system itself. The filesystem would just give an interface to the files which would actually be stored independently at different location. SLAs  generally dictate conditions to govern performance, availability, recoverability, costs and other critical metrics.  The file system would be capable for enforcing these conditions. For example:
+
+Performance:
+    Very High   : File will be stored in memory.
+    High           : File will be stored in SSD
+    Medium      : File will stored in the DISK
+    Low            : File will be stored in NFS
+    very Low    : File will compressed and stored in NFS
+
+Availability and Recoverability:
+    Very High    :    Multiple copies would be stored in geographically distributed DC’s.
+    High         :    Multiple copies would be stored in local DC’s.
+    Medium       :    Multiple copies would be stored in local machine in different disks
+    Low          :    Single file will be stored.
+
+   
+The file system would be responsible for replication and placement of resources based on the requirements of SLA.  The file would be associated with the SLA condition by placing them in the respective user groups.
