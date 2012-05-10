@@ -11,6 +11,7 @@ if sys.version_info[:2] != (2,6):
 	sys.stderr.write(msg % (sys.version_info[0],sys.version_info[1])) 
 
 try:
+	import logging
 	from fuse import Fuse
 	import fuse
 	import stat,os
@@ -22,17 +23,29 @@ fuse.fuse_python_api = (0, 2)
 
 class fs(Fuse):
 	''' This class inherits from python fuse class. Complete documentation on the use of this library can be found at http://sourceforge.net/apps/mediawiki/fuse/index.php?title=FUSE_Python_Reference '''
+
 	def __init__(self,*args, **kwargs):
 		Fuse.__init__(self,*args, **kwargs)
+		logging.basicConfig(filename="fs.log", level=logging.DEBUG, format="%(level)s %(asctime)s %(message)s")
+
 	
 	def getattr(self, path):
-	      print 'called getattr:', path
+	      logging.info("inside getattr method with path = %s", path)
 	      if (path == '/'):
 	         t = [0,]*10
         	 t[0] = stat.S_IFDIR | 0755
 	         t[3] = 2; t[6] = 2048
 	         return t
-	      else: return -ENOENT		
+	      else: return -ENOENT	
+	def read(self, path):
+		pass
+	
+	def write(self, path):
+		pass
+
+	def mknode(self, path):
+		pass
+		
 
 if __name__ == "__main__":
 	server = fs()
