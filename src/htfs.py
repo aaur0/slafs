@@ -109,22 +109,26 @@ class HTFS(fuse.Fuse):
 
     # --- Metadata -----------------------------------------------------------
     def getattr(self, path):
-	logging.info("inside getattr method with path = %s",path)
-        if not path in self._storage:
-            return -errno.ENOENT
-	logging.debug(self._storage)
-        # Lookup Item and fill the stat struct
-        item = self._storage[path]
-        st = zstat(fuse.Stat())
-        st.st_mode  = item.mode
-        st.st_uid   = item.uid
-        st.st_gid   = item.gid
-        st.st_dev   = item.dev
-        st.st_atime = item.atime
-        st.st_mtime = item.mtime
-        st.st_ctime = item.ctime
-        st.st_size  = len(item.data)
-        return st
+	try:
+		logging.info("inside getattr method with path = %s",path)
+	        if not path in self._storage:
+        	    return -errno.ENOENT
+		logging.debug(self._storage)
+        	# Lookup Item and fill the stat struct
+	        item = self._storage[path]
+        	st = zstat(fuse.Stat())
+	        st.st_mode  = item.mode
+        	st.st_uid   = item.uid
+	        st.st_gid   = item.gid
+        	st.st_dev   = item.dev
+	        st.st_atime = item.atime
+	        st.st_mtime = item.mtime
+	        st.st_ctime = item.ctime
+	        st.st_size  = len(item.data)
+        	return st
+	except Exception,e:
+		logging.error("HTFS:getattr failed with errors : %s", str(e))
+		return -1
 
     def chmod(self, path, mode):
         logging.info("inside HTFS:chmod :: path  = %s, mode = %s", str(path), str(mode))
@@ -138,11 +142,15 @@ class HTFS(fuse.Fuse):
         item.gid = gid
 
     def utime(self, path, times):
-	logging.info("inside HTFS:utime :: path = %s, times = %s", str(path), str(times))
-        item = self._storage[path]
-        item.ctime = item.mtime = times[0]
-	item.hitcount+=1
-	logging.info("HTFS:utime :: the item has been accessed %s times ", item.hitcount)
+	try:
+		logging.info("inside HTFS:utime :: path = %s, times = %s", str(path), str(times))
+	        item = self._storage[path]
+	        item.ctime = item.mtime = times[0]
+		item.hitcount+=1
+		logging.info("HTFS:utime :: the item has been accessed %s times ", item.hitcount)
+	except Exception,e:
+		logging.error("HTFS:utime failed with errors : %s ", str(e))
+		return -1
 
     # --- Namespace ----------------------------------------------------------
     def unlink(self, path):
@@ -217,7 +225,6 @@ class HTFS(fuse.Fuse):
 	logging.info("HTFS:open :: path = %s and flags = %s", str(path), str(flags))
 	return 0
 	pass
-	(self._storage[path])[hitcount]+=1
 
     def truncate(self, path, len):
 	logging.info("HTFS:trucate :: path = %s, len = %s", path , str(len))
